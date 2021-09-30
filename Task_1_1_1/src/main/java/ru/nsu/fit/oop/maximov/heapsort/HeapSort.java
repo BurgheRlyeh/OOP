@@ -1,9 +1,13 @@
 package ru.nsu.fit.oop.maximov.heapsort;
 
 public class HeapSort {
+    /**
+     * This method sorts given array in-place
+     * @param arr Array to sort
+     */
     static public void heapsort(int[] arr) {
         if (arr == null) {
-            throw new IllegalArgumentException("Null pointer passed to function");
+            throw new IllegalArgumentException();
         }
 
         // heap building
@@ -21,6 +25,11 @@ public class HeapSort {
         }
     }
 
+    /**
+     * @param arr Array to heapify
+     * @param idx Index of node to heapify from
+     * @param size Size of array
+     */
     // heapify idx's subtree
     static void heapify(int[] arr, int idx, int size) {
         int max = idx; // Initialize max as root
@@ -45,6 +54,11 @@ public class HeapSort {
         heapify(arr, max, size);
     }
 
+    /**
+     * @param arr Array in which elements sholud be swapped
+     * @param i Index of the 1st element
+     * @param j Index of the 2nd element
+     */
     static void swap(int[] arr, int i, int j) {
         int temp = arr[i];
         arr[i] = arr[j];
