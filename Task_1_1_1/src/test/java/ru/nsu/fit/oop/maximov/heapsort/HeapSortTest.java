@@ -29,8 +29,7 @@ public class HeapSortTest {
     @ParameterizedTest
     @MethodSource("arrays")
     void comp(int[] array) {
-        int[] result = new int[array.length];
-        System.arraycopy(array, 0, result, 0, array.length);
+        int[] result = array.clone();
 
         HeapSort.heapsort(array);   // sort array
         Arrays.sort(result, 0, result.length);  // sort by built-in sort

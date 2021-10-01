@@ -5,7 +5,7 @@ public class HeapSort {
      * This method sorts given array in-place
      * @param arr Array to sort
      */
-    static public void heapsort(int[] arr) {
+    public static void heapsort(int[] arr) {
         if (arr == null) {
             throw new IllegalArgumentException();
         }
@@ -31,7 +31,7 @@ public class HeapSort {
      * @param size Size of array
      */
     // heapify idx's subtree
-    static void heapify(int[] arr, int idx, int size) {
+    private static void heapify(int[] arr, int idx, int size) {
         int max = idx; // Initialize max as root
         int left = 2 * idx + 1, right = left + 1; // children
 
@@ -59,7 +59,7 @@ public class HeapSort {
      * @param i Index of the 1st element
      * @param j Index of the 2nd element
      */
-    static void swap(int[] arr, int i, int j) {
+    private static void swap(int[] arr, int i, int j) {
         int temp = arr[i];
         arr[i] = arr[j];
         arr[j] = temp;
