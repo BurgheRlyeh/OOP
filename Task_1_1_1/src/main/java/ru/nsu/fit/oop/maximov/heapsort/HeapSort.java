@@ -3,6 +3,7 @@ package ru.nsu.fit.oop.maximov.heapsort;
 public class HeapSort {
     /**
      * This method sorts given array in-place
+     *
      * @param arr Array to sort
      */
     public static void heapsort(int[] arr) {
@@ -26,11 +27,12 @@ public class HeapSort {
     }
 
     /**
+     * Heapify idx's subtree.
+     *
      * @param arr Array to heapify
      * @param idx Index of node to heapify from
      * @param size Size of array
      */
-    // heapify idx's subtree
     private static void heapify(int[] arr, int idx, int size) {
         int max = idx; // Initialize max as root
         int left = 2 * idx + 1, right = left + 1; // children
