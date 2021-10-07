@@ -1,0 +1,1 @@
+home/burgherlyeh/brogramming/OOP/Task_1_1_2/src/main/java/ru/nsu/fit/oop/maximov/file.txt
