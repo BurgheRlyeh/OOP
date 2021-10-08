@@ -18,19 +18,19 @@ public class SubStringTest {
         return Stream.of(
                 // empty file & empty pattern
                 Arguments.of(
-                        new FileReader("EmptyFile.txt"),
+                        new FileReader("src/test/java/ru/nsu/fit/oop/maximov/files/EmptyFile.txt"),
                         "",
                         IllegalArgumentException.class
                 ),
                 // empty file
                 Arguments.of(
-                        new FileReader("EmptyFile.txt"),
+                        new FileReader("src/test/java/ru/nsu/fit/oop/maximov/files/EmptyFile.txt"),
                         "file",
                         IOException.class
                 ),
                 // empty pattern
                 Arguments.of(
-                        new FileReader("SmallFile.txt"),
+                        new FileReader("src/test/java/ru/nsu/fit/oop/maximov/files/SmallFile.txt"),
                         "",
                         IllegalArgumentException.class
                 )
@@ -58,19 +58,19 @@ public class SubStringTest {
                 ),
                 // pattern = one symbol
                 Arguments.of(
-                        new FileReader("SmallFile.txt"),
+                        new FileReader("src/test/java/ru/nsu/fit/oop/maximov/files/SmallFile.txt"),
                         "l",
                         Arrays.asList(3, 4, 8, 22)
                 ),
                 // small file
                 Arguments.of(
-                        new FileReader("SmallFile.txt"),
+                        new FileReader("src/test/java/ru/nsu/fit/oop/maximov/files/SmallFile.txt"),
                         "file",
                         Arrays.asList(6, 20)
                 ),
                 // big file
                 Arguments.of(
-                        new FileReader("BigFile.txt"),
+                        new FileReader("src/test/java/ru/nsu/fit/oop/maximov/files/BigFile.txt"),
                         "clock will",
                         Arrays.asList(821, 884, 1109, 1184, 1517, 1563, 1821, 7114)
                 )
@@ -87,7 +87,7 @@ public class SubStringTest {
 
     @Test   // big file by filepath
     public void bigFileByFilepath() throws IOException {
-        ArrayList<Integer> result = SubString.substring("BigFile.txt", "clock will");
+        ArrayList<Integer> result = SubString.substring("src/test/java/ru/nsu/fit/oop/maximov/files/BigFile.txt", "clock will");
         ArrayList<Integer> answer = new ArrayList<>(Arrays.asList(821, 884, 1109, 1184, 1517, 1563, 1821, 7114));
         assertArrayEquals(result.toArray(), answer.toArray());
     }
