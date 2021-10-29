@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class GradeBook {
-    private int id;         // grade book's id
-    private String name;    // student's name
-    private String surname; // student's surname
+    private final int id;         // grade book's id
+    private final String name;    // student's name
+    private final String surname; // student's surname
     private int semesterNumber;   // num of current semester
     private int qualifyingWork;   // qualifying work grade
 
@@ -22,13 +22,18 @@ public class GradeBook {
     // HashMap<Semester, HashMap<Subject, Grade>>
     private final ArrayList<HashMap<String, Integer>> semesters = new ArrayList<>();
 
+    /**
+     * @param id id of grade book
+     * @param name first name of student
+     * @param surname surname of student
+     */
     GradeBook(int id, String name, String surname) {
         this.id = id;
         this.name = name;
         this.surname = surname;
 
         semesters.add(null);
-        for (int i = 1; i < SEMESTER_NUMBER + 1; ++i) {
+        for (int i = 1; i <= SEMESTER_NUMBER; ++i) {
             semesters.add(new HashMap<>());
         }
         qualifyingWork = 0;
@@ -37,18 +42,18 @@ public class GradeBook {
         scholarship = Scholarship.Regular;
     }
 
-    HashMap<String, Integer> getSemester(int semester) {
+    private HashMap<String, Integer> getSemester(int semester) {
         return semesters.get(semester);
     }
 
-    boolean isGradeCorrect(int grade) {
-        return 2 <= grade || grade <= 5;
+    private boolean isGradeCorrect(int grade) {
+        return 2 <= grade && grade <= 5;
     }
 
-    void gradePut(String subject, int grade) {
+    public void gradePut(String subject, int grade) {
         gradePut(semesterNumber, subject, grade);
     }
-    void gradePut(int semesterNum, String subject, int grade) {
+    public void gradePut(int semesterNum, String subject, int grade) {
         var semester = getSemester(semesterNum);
 
         if (!isGradeCorrect(grade)) {
@@ -61,10 +66,23 @@ public class GradeBook {
         semester.put(subject, grade);
     }
 
-    void gradeReplace(String subject, int grade) throws KeyException {
+    public Integer gradeGet(String subject) throws KeyException {
+        return gradeGet(semesterNumber, subject);
+    }
+    public Integer gradeGet(int semesterNum, String subject) throws KeyException {
+        var semester = getSemester(semesterNum);
+
+        if (!semester.containsKey(subject)) {
+            throw new KeyException(subject + "is missing this semester");
+        }
+
+        return semester.get(subject);
+    }
+
+    public void gradeReplace(String subject, int grade) throws KeyException {
         gradeReplace(semesterNumber, subject, grade);
     }
-    void gradeReplace(int semesterNum, String subject, int grade) throws KeyException {
+    public void gradeReplace(int semesterNum, String subject, int grade) throws KeyException {
         var semester = getSemester(semesterNum);
 
         if (!isGradeCorrect(grade)) {
@@ -77,10 +95,10 @@ public class GradeBook {
         semester.replace(subject, grade);
     }
 
-    void gradeRemove(String subject) throws KeyException {
+    public void gradeRemove(String subject) throws KeyException {
         gradeRemove(semesterNumber, subject);
     }
-    void gradeRemove(int semesterNum, String subject) throws KeyException {
+    public void gradeRemove(int semesterNum, String subject) throws KeyException {
         var semester = getSemester(semesterNum);
 
         if (!semester.containsKey(subject)) {
@@ -90,76 +108,102 @@ public class GradeBook {
         semester.remove(subject);
     }
 
-    double gradeAverageBySemester() {
-        return gradeAverageBySemester(semesterNumber);
-    }
-    double gradeAverageBySemester(int semesterNum) {
-        var semester = getSemester(semesterNum);
+    private HashMap<String, Integer> getAllSemesters() throws Exception {
+        var map = new HashMap<String, Integer>();
 
+        for (int i = 1; i <= SEMESTER_NUMBER; ++i) {
+            var semester = getSemester(i);
+            map.putAll(semester);
+        }
+
+        if (map.isEmpty()) {
+            throw new Exception("No disciplines in this semester");
+        }
+
+        return map;
+    }
+
+    boolean containsSubjectInSemester(String subject) {
+        return containsSubjectInSemester(semesterNumber, subject);
+    }
+    boolean containsSubjectInSemester(int semesterNum, String subject) {
+        var semester = getSemester(semesterNum);
+        return semester.containsKey(subject);
+    }
+    boolean containsSubject(String subject) throws Exception {
+        var map = getAllSemesters();
+
+        return map.containsKey(subject);
+    }
+
+    private double averageOfHashMap(HashMap<String, Integer> map) {
         int sum = 0;
-        for (int grade : semester.values()) {
+        for (int grade : map.values()) {
             sum += grade;
         }
 
-        return (double)sum / (double)semester.size();
+        return (double)sum / (double)map.size();
     }
-    double gradeAverage() {
-        double average = 0.0;
-        for (int i = 1; i < SEMESTER_NUMBER; ++i) {
-            average += gradeAverageBySemester(i);
+    public double gradeAverageBySemester() throws Exception {
+        return gradeAverageBySemester(semesterNumber);
+    }
+    public double gradeAverageBySemester(int semesterNum) throws Exception {
+        var semester = getSemester(semesterNum);
+        if (semester.isEmpty()) {
+            throw new Exception("No disciplines in this semester");
         }
-        return average;
+
+        return averageOfHashMap(getSemester(semesterNum));
+    }
+    public double gradeAverage() throws Exception {
+        var map = getAllSemesters();
+        return averageOfHashMap(map);
     }
 
-    boolean isWithSatisfactoryInSemester() {
+    public boolean isWithSatisfactoryInSemester() throws Exception {
         return isWithSatisfactoryInSemester(semesterNumber);
     }
-    boolean isWithSatisfactoryInSemester(int semesterNum) {
+    public boolean isWithSatisfactoryInSemester(int semesterNum) throws Exception {
         var semester = getSemester(semesterNum);
 
-        for (int grade : semester.values()) {
-            if (grade == 3) {
-                return true;
-            }
+        if (semester.isEmpty()) {
+            throw new Exception("No disciplines in this semester");
         }
 
-        return false;
+        return semester.containsValue(2) || semester.containsValue(3);
     }
-    boolean isWithSatisfactory() {
-        for (int i = 1; i < SEMESTER_NUMBER; ++i) {
-            if (isWithSatisfactoryInSemester(i)) {
-                return true;
-            }
-        }
-        return false;
+    public boolean isWithSatisfactory() throws Exception {
+        var map = getAllSemesters();
+
+        return map.containsValue(2) || map.containsValue(3);
     }
 
-    Scholarship scholarshipNext() {
+    public Scholarship scholarshipNext() throws Exception {
         if (isWithSatisfactoryInSemester()) {
             return Scholarship.NULL;
         }
         return gradeAverage() == 5.0 ?
                 Scholarship.Big : Scholarship.Regular;
     }
-    boolean isScholarshipWillBeIncreased() {
+    public boolean isScholarshipWillBeIncreased() throws Exception {
         var next = scholarshipNext();
         return scholarship == Scholarship.NULL && next != Scholarship.NULL ||
                 scholarship == Scholarship.Regular && next == Scholarship.Big;
     }
 
-    void semesterMoveNext() {
+    public void semesterMoveNext() throws Exception {
         scholarship = scholarshipNext();
         ++semesterNumber;
     }
 
-    void setQualifyingWork(int grade) {
+    public void setQualifyingWork(int grade) {
         if (!isGradeCorrect(grade)) {
             throw new IllegalArgumentException("Illegal grade");
         }
         qualifyingWork = grade;
     }
 
-    boolean isCanGetHonorDegree() {
+    public boolean isCanGetHonorDegree() throws Exception {
         return 4.75 <= gradeAverage() && !isWithSatisfactory() && qualifyingWork == 5;
     }
 }
