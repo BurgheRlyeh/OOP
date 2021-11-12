@@ -14,16 +14,16 @@ public class GradeBookTest {
         var gradeBook = new GradeBook(200698, "Egor", "Maximov");
 
         // the 1st semester's grades
-        gradeBook.gradePut("Введение в алгебру и анализ", 4);
-        gradeBook.gradePut("Введение в дискретную математику и математическую логику", 5);
-        gradeBook.gradePut("Декларативное программирование", 5);
-        gradeBook.gradePut("Императивное программирование", 5);
-        gradeBook.gradePut("Иностранный язык", 5);
-        gradeBook.gradePut("Физическая культура и спорт", 5);
-        gradeBook.gradePut("Физическая культура и спорт (элективная дисциплина)", 5);
-        gradeBook.gradePut("Цифровые платформы", 5);
-        gradeBook.gradePut("История", 5);
-        gradeBook.gradePut("Основы культуры речи", 5);
+        gradeBook.putGrade("Введение в алгебру и анализ", 4);
+        gradeBook.putGrade("Введение в дискретную математику и математическую логику", 5);
+        gradeBook.putGrade("Декларативное программирование", 5);
+        gradeBook.putGrade("Императивное программирование", 5);
+        gradeBook.putGrade("Иностранный язык", 5);
+        gradeBook.putGrade("Физическая культура и спорт", 5);
+        gradeBook.putGrade("Физическая культура и спорт (элективная дисциплина)", 5);
+        gradeBook.putGrade("Цифровые платформы", 5);
+        gradeBook.putGrade("История", 5);
+        gradeBook.putGrade("Основы культуры речи", 5);
 
         return gradeBook;
     }
@@ -34,19 +34,19 @@ public class GradeBookTest {
 
         // try to put illegal grade
         assertThrows(IllegalArgumentException.class,
-                () -> { book.gradePut("Some Subject", 6); } );
+                () -> { book.putGrade("Some Subject", 6); } );
 
         // try to get "put" grade
         assertThrows(KeyException.class,
-                () -> { book.gradeGet("Some Subject"); } );
+                () -> { book.getGrade("Some Subject"); } );
 
         // try to replace some absent discipline
         assertThrows(KeyException.class,
-                () -> { book.gradeReplace("Some Subject", 5); } );
+                () -> { book.replaceGrade("Some Subject", 5); } );
 
         // try to remove some absent discipline
         assertThrows(KeyException.class,
-                () -> { book.gradeRemove("Some Subject"); } );
+                () -> { book.removeGrade("Some Subject"); } );
 
         // try to count average grade
         assertThrows(Exception.class, book::gradeAverage);
@@ -66,17 +66,17 @@ public class GradeBookTest {
         var book = myGradeBook();
 
         // put some subject with its grade
-        book.gradePut("Some Subject", 3);
+        book.putGrade("Some Subject", 3);
 
         // get and compare with put grade
-        assertEquals(book.gradeGet("Some Subject"), 3);
+        assertEquals(book.getGrade("Some Subject"), 3);
 
         // replace grade
-        book.gradeReplace("Some Subject", 4);
-        assertEquals(book.gradeGet("Some Subject"), 4);
+        book.replaceGrade("Some Subject", 4);
+        assertEquals(book.getGrade("Some Subject"), 4);
 
         // remove subject
-        book.gradeRemove("Some Subject");
+        book.removeGrade("Some Subject");
         assertFalse(book.containsSubject("Some Subject"));
 
         // count average grade
@@ -88,7 +88,7 @@ public class GradeBookTest {
         // assert scholarship will not be increased
         assertFalse(book.isScholarshipWillBeIncreased());
         // replace 4 on 5
-        book.gradeReplace("Введение в алгебру и анализ", 5);
+        book.replaceGrade("Введение в алгебру и анализ", 5);
         // assert scholarship will be increased
         assertTrue(book.isScholarshipWillBeIncreased());
 

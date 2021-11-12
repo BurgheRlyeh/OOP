@@ -15,7 +15,7 @@ public class GradeBook {
     private final int SEMESTER_NUMBER = 8;
 
     private enum Scholarship {
-        NULL, Regular, Big
+        Null, Regular, Big
     }
     private Scholarship scholarship;
 
@@ -49,13 +49,19 @@ public class GradeBook {
     private boolean isGradeCorrect(int grade) {
         return 2 <= grade && grade <= 5;
     }
-
-    public void gradePut(String subject, int grade) {
-        gradePut(semesterNumber, subject, grade);
+    private boolean isSemesterCorrect(int semester) {
+        return 1 <= semester && semester <= 8;
     }
-    public void gradePut(int semesterNum, String subject, int grade) {
+
+    public void putGrade(String subject, int grade) {
+        putGrade(semesterNumber, subject, grade);
+    }
+    public void putGrade(int semesterNum, String subject, int grade) {
         var semester = getSemester(semesterNum);
 
+        if (!isSemesterCorrect(semesterNum)) {
+            throw new IllegalArgumentException("Illegal semester num");
+        }
         if (!isGradeCorrect(grade)) {
             throw new IllegalArgumentException("Illegal grade");
         }
@@ -66,12 +72,15 @@ public class GradeBook {
         semester.put(subject, grade);
     }
 
-    public Integer gradeGet(String subject) throws KeyException {
-        return gradeGet(semesterNumber, subject);
+    public Integer getGrade(String subject) throws KeyException {
+        return getGrade(semesterNumber, subject);
     }
-    public Integer gradeGet(int semesterNum, String subject) throws KeyException {
+    public Integer getGrade(int semesterNum, String subject) throws KeyException {
         var semester = getSemester(semesterNum);
 
+        if (!isSemesterCorrect(semesterNum)) {
+            throw new IllegalArgumentException("Illegal semester num");
+        }
         if (!semester.containsKey(subject)) {
             throw new KeyException(subject + "is missing this semester");
         }
@@ -79,12 +88,15 @@ public class GradeBook {
         return semester.get(subject);
     }
 
-    public void gradeReplace(String subject, int grade) throws KeyException {
-        gradeReplace(semesterNumber, subject, grade);
+    public void replaceGrade(String subject, int grade) throws KeyException {
+        replaceGrade(semesterNumber, subject, grade);
     }
-    public void gradeReplace(int semesterNum, String subject, int grade) throws KeyException {
+    public void replaceGrade(int semesterNum, String subject, int grade) throws KeyException {
         var semester = getSemester(semesterNum);
 
+        if (!isSemesterCorrect(semesterNum)) {
+            throw new IllegalArgumentException("Illegal semester num");
+        }
         if (!isGradeCorrect(grade)) {
             throw new IllegalArgumentException("Illegal grade");
         }
@@ -95,12 +107,15 @@ public class GradeBook {
         semester.replace(subject, grade);
     }
 
-    public void gradeRemove(String subject) throws KeyException {
-        gradeRemove(semesterNumber, subject);
+    public void removeGrade(String subject) throws KeyException {
+        removeGrade(semesterNumber, subject);
     }
-    public void gradeRemove(int semesterNum, String subject) throws KeyException {
+    public void removeGrade(int semesterNum, String subject) throws KeyException {
         var semester = getSemester(semesterNum);
 
+        if (!isSemesterCorrect(semesterNum)) {
+            throw new IllegalArgumentException("Illegal semester num");
+        }
         if (!semester.containsKey(subject)) {
             throw new KeyException(subject + "is missing this semester");
         }
@@ -127,6 +142,9 @@ public class GradeBook {
         return containsSubjectInSemester(semesterNumber, subject);
     }
     boolean containsSubjectInSemester(int semesterNum, String subject) {
+        if (!isSemesterCorrect(semesterNum)) {
+            throw new IllegalArgumentException("Illegal semester num");
+        }
         var semester = getSemester(semesterNum);
         return semester.containsKey(subject);
     }
@@ -148,6 +166,9 @@ public class GradeBook {
         return gradeAverageBySemester(semesterNumber);
     }
     public double gradeAverageBySemester(int semesterNum) throws Exception {
+        if (!isSemesterCorrect(semesterNum)) {
+            throw new IllegalArgumentException("Illegal semester num");
+        }
         var semester = getSemester(semesterNum);
         if (semester.isEmpty()) {
             throw new Exception("No disciplines in this semester");
@@ -164,6 +185,9 @@ public class GradeBook {
         return isWithSatisfactoryInSemester(semesterNumber);
     }
     public boolean isWithSatisfactoryInSemester(int semesterNum) throws Exception {
+        if (!isSemesterCorrect(semesterNum)) {
+            throw new IllegalArgumentException("Illegal semester num");
+        }
         var semester = getSemester(semesterNum);
 
         if (semester.isEmpty()) {
@@ -180,14 +204,14 @@ public class GradeBook {
 
     public Scholarship scholarshipNext() throws Exception {
         if (isWithSatisfactoryInSemester()) {
-            return Scholarship.NULL;
+            return Scholarship.Null;
         }
         return gradeAverage() == 5.0 ?
                 Scholarship.Big : Scholarship.Regular;
     }
     public boolean isScholarshipWillBeIncreased() throws Exception {
         var next = scholarshipNext();
-        return scholarship == Scholarship.NULL && next != Scholarship.NULL ||
+        return scholarship == Scholarship.Null && next != Scholarship.Null ||
                 scholarship == Scholarship.Regular && next == Scholarship.Big;
     }
 
