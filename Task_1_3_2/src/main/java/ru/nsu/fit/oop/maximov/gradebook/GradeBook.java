@@ -38,9 +38,9 @@ public class GradeBook {
 
     private HashMap<String, Integer> getSemester(int semester) {
         if (1 <= semester && semester <= 8) {
-            throw new IllegalArgumentException("Illegal semester num");
+            return semesters.get(semester);
         }
-        return semesters.get(semester);
+        throw new IllegalArgumentException("Illegal semester num");
     }
 
     private boolean isGradeCorrect(int grade) {
