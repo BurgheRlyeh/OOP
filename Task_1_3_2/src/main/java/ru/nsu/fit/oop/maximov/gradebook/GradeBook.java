@@ -9,22 +9,16 @@ public class GradeBook {
     private final int id;         // grade book's id
     private final String name;    // student's name
     private final String surname; // student's surname
-    private int semesterNumber;   // num of current semester
-    private int qualifyingWork;   // qualifying work grade
-
     private final int SEMESTER_NUMBER = 8;
-
-    private enum Scholarship {
-        Null, Regular, Big
-    }
-    private Scholarship scholarship;
-
     // HashMap<Semester, HashMap<Subject, Grade>>
     private final ArrayList<HashMap<String, Integer>> semesters = new ArrayList<>();
+    private int semesterNumber;   // num of current semester
+    private int qualifyingWork;   // qualifying work grade
+    private Scholarship scholarship;
 
     /**
-     * @param id id of grade book
-     * @param name first name of student
+     * @param id      id of grade book
+     * @param name    first name of student
      * @param surname surname of student
      */
     GradeBook(int id, String name, String surname) {
@@ -43,28 +37,23 @@ public class GradeBook {
     }
 
     private HashMap<String, Integer> getSemester(int semester) {
+        if (1 <= semester && semester <= 8) {
+            throw new IllegalArgumentException("Illegal semester num");
+        }
         return semesters.get(semester);
     }
 
     private boolean isGradeCorrect(int grade) {
         return 2 <= grade && grade <= 5;
     }
-    private boolean isSemesterCorrect(int semester) {
-        return 1 <= semester && semester <= 8;
-    }
 
     public void putGrade(String subject, int grade) {
         putGrade(semesterNumber, subject, grade);
     }
+
     public void putGrade(int semesterNum, String subject, int grade) {
         var semester = getSemester(semesterNum);
 
-        if (!isSemesterCorrect(semesterNum)) {
-            throw new IllegalArgumentException("Illegal semester num");
-        }
-        if (!isGradeCorrect(grade)) {
-            throw new IllegalArgumentException("Illegal grade");
-        }
         if (semester.containsKey(subject)) {
             throw new KeyAlreadyExistsException();
         }
@@ -75,12 +64,10 @@ public class GradeBook {
     public Integer getGrade(String subject) throws KeyException {
         return getGrade(semesterNumber, subject);
     }
+
     public Integer getGrade(int semesterNum, String subject) throws KeyException {
         var semester = getSemester(semesterNum);
 
-        if (!isSemesterCorrect(semesterNum)) {
-            throw new IllegalArgumentException("Illegal semester num");
-        }
         if (!semester.containsKey(subject)) {
             throw new KeyException(subject + "is missing this semester");
         }
@@ -91,15 +78,10 @@ public class GradeBook {
     public void replaceGrade(String subject, int grade) throws KeyException {
         replaceGrade(semesterNumber, subject, grade);
     }
+
     public void replaceGrade(int semesterNum, String subject, int grade) throws KeyException {
         var semester = getSemester(semesterNum);
 
-        if (!isSemesterCorrect(semesterNum)) {
-            throw new IllegalArgumentException("Illegal semester num");
-        }
-        if (!isGradeCorrect(grade)) {
-            throw new IllegalArgumentException("Illegal grade");
-        }
         if (!semester.containsKey(subject)) {
             throw new KeyException(subject + "is missing this semester");
         }
@@ -110,12 +92,10 @@ public class GradeBook {
     public void removeGrade(String subject) throws KeyException {
         removeGrade(semesterNumber, subject);
     }
+
     public void removeGrade(int semesterNum, String subject) throws KeyException {
         var semester = getSemester(semesterNum);
 
-        if (!isSemesterCorrect(semesterNum)) {
-            throw new IllegalArgumentException("Illegal semester num");
-        }
         if (!semester.containsKey(subject)) {
             throw new KeyException(subject + "is missing this semester");
         }
@@ -141,13 +121,12 @@ public class GradeBook {
     boolean containsSubjectInSemester(String subject) {
         return containsSubjectInSemester(semesterNumber, subject);
     }
+
     boolean containsSubjectInSemester(int semesterNum, String subject) {
-        if (!isSemesterCorrect(semesterNum)) {
-            throw new IllegalArgumentException("Illegal semester num");
-        }
         var semester = getSemester(semesterNum);
         return semester.containsKey(subject);
     }
+
     boolean containsSubject(String subject) throws Exception {
         var map = getAllSemesters();
 
@@ -160,15 +139,14 @@ public class GradeBook {
             sum += grade;
         }
 
-        return (double)sum / (double)map.size();
+        return (double) sum / (double) map.size();
     }
+
     public double gradeAverageBySemester() throws Exception {
         return gradeAverageBySemester(semesterNumber);
     }
+
     public double gradeAverageBySemester(int semesterNum) throws Exception {
-        if (!isSemesterCorrect(semesterNum)) {
-            throw new IllegalArgumentException("Illegal semester num");
-        }
         var semester = getSemester(semesterNum);
         if (semester.isEmpty()) {
             throw new Exception("No disciplines in this semester");
@@ -176,6 +154,7 @@ public class GradeBook {
 
         return averageOfHashMap(getSemester(semesterNum));
     }
+
     public double gradeAverage() throws Exception {
         var map = getAllSemesters();
         return averageOfHashMap(map);
@@ -184,10 +163,8 @@ public class GradeBook {
     public boolean isWithSatisfactoryInSemester() throws Exception {
         return isWithSatisfactoryInSemester(semesterNumber);
     }
+
     public boolean isWithSatisfactoryInSemester(int semesterNum) throws Exception {
-        if (!isSemesterCorrect(semesterNum)) {
-            throw new IllegalArgumentException("Illegal semester num");
-        }
         var semester = getSemester(semesterNum);
 
         if (semester.isEmpty()) {
@@ -196,6 +173,7 @@ public class GradeBook {
 
         return semester.containsValue(2) || semester.containsValue(3);
     }
+
     public boolean isWithSatisfactory() throws Exception {
         var map = getAllSemesters();
 
@@ -204,14 +182,15 @@ public class GradeBook {
 
     public Scholarship scholarshipNext() throws Exception {
         if (isWithSatisfactoryInSemester()) {
-            return Scholarship.Null;
+            return Scholarship.None;
         }
         return gradeAverage() == 5.0 ?
                 Scholarship.Big : Scholarship.Regular;
     }
+
     public boolean isScholarshipWillBeIncreased() throws Exception {
         var next = scholarshipNext();
-        return scholarship == Scholarship.Null && next != Scholarship.Null ||
+        return scholarship == Scholarship.None && next != Scholarship.None ||
                 scholarship == Scholarship.Regular && next == Scholarship.Big;
     }
 
@@ -229,5 +208,9 @@ public class GradeBook {
 
     public boolean isCanGetHonorDegree() throws Exception {
         return 4.75 <= gradeAverage() && !isWithSatisfactory() && qualifyingWork == 5;
+    }
+
+    private enum Scholarship {
+        None, Regular, Big
     }
 }
