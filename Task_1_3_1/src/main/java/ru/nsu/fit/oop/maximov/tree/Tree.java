@@ -4,12 +4,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 public class Tree<E extends Comparable<E>> implements Collection<E> {
-    public static void main(String[] args) {
-        var array = new ArrayList<Integer>();
-        var splitter = array.spliterator();
-    }
-
-    class Node {
+    private class Node {
         private Node left;
 
         private E key;
@@ -29,6 +24,11 @@ public class Tree<E extends Comparable<E>> implements Collection<E> {
     private int size = 0;
     private boolean isTreeChanged = false;
 
+    Tree() {};
+    Tree(Collection<E> collection) {
+        this.addAll(collection);
+    }
+
     private int height(Node node) {
         return node == null ? -1 : node.height;
     }
@@ -41,7 +41,9 @@ public class Tree<E extends Comparable<E>> implements Collection<E> {
     private void updateAncestors(Node x, Node y, Node z) {
         x.anc = y.anc;
         y.anc = x;
-        z.anc = y;
+        if (z != null) {
+            z.anc = y;
+        }
     }
 
     private Node rotateLeft(Node y) {
@@ -78,13 +80,13 @@ public class Tree<E extends Comparable<E>> implements Collection<E> {
 
         updateHeight(node);
         if (balance(node) < -1) {
-            if (height(node.left.left) <= height(node.left.right)) {
+            if (height(node.left.left) < height(node.left.right)) {
                 node.left = rotateLeft(node.left);
             }
             node = rotateRight(node);
         }
         else if (balance(node) > 1) {
-            if (height(node.right.right) <= height(node.right.left)) {
+            if (height(node.right.right) < height(node.right.left)) {
                 node.right = rotateRight(node.right);
             }
             node = rotateLeft(node);
@@ -106,6 +108,20 @@ public class Tree<E extends Comparable<E>> implements Collection<E> {
         return node.right != null ? max(node.right) : node;
     }
 
+    private Node nextNode(Node node) {
+        if (node.right != null) {
+            node = min(node.right);
+        }
+        else {
+            Node prev = node;
+            node = node.anc;
+            while (prev == node.right) {
+                prev = node;
+                node = node.anc;
+            }
+        }
+        return node;
+    }
 
     @Override
     public int size() {
@@ -136,90 +152,99 @@ public class Tree<E extends Comparable<E>> implements Collection<E> {
         return find(key.compareTo(node.key) < 0 ? node.left : node.right, key);
     }
 
-//    public Spliterator<E> spliterator() {
-//        return new Spliterator<>() {
-//            public static int ORDERED       = 0b10000000;
-//            public static int DISTINCT      = 0b01000000;
-//            public static int SORTED        = 0b00100000;
-//            public static int SIZED         = 0b00010000;
-//            public static int NONNULL       = 0;
-//            public static int IMMUTABLE     = 0;
-//            public static int CONCURRENT    = 0;
-//            public static int SUBSIZED      = 0;
-//
-//            {
-//
-//            }
-//
-//            @Override
-//            public boolean tryAdvance(Consumer<? super E> action) {
-//                return false;
-//            }
-//
-//            @Override
-//            public Spliterator<E> trySplit() {
-//                return null;
-//            }
-//
-//            @Override
-//            public long estimateSize() {
-//                return 0;
-//            }
-//
-//            @Override
-//            public int characteristics() {
-//                return 0;
-//            }
-//        };
-//    }
+    public Spliterator<E> spliterator() {
+        return new TreeSpliterator();
+    }
+    private class TreeSpliterator implements Spliterator<E> {
+        Node node;
+        Node last;
+        Node subroot;
+        int subsize;
+
+        TreeSpliterator() {
+            this(root, size);
+        }
+        TreeSpliterator(Node node, int subsize) {
+            this.subroot = node;
+            this.node = min(node);
+            this.subsize = subsize;
+            last = max(node);
+        }
+
+        @Override
+        public boolean tryAdvance(Consumer<? super E> action) {
+            if (node == last) {
+                return false;
+            }
+            action.accept(node.key);
+            node = nextNode(node);
+            return true;
+        }
+
+        @Override
+        public Spliterator<E> trySplit() {
+            if (node.left == null || node.right == null) {
+                return null;
+            }
+
+            node = subroot;
+            subsize /= 2;
+            return new TreeSpliterator(node.left, subsize);
+        }
+
+        @Override
+        public long estimateSize() {
+            return subsize;
+        }
+
+        @Override
+        public int characteristics() {
+            return ORDERED | DISTINCT | SORTED | SIZED | SUBSIZED;
+        }
+
+        @Override
+        public Comparator<? super E> getComparator() {
+            return null;
+        }
+    }
 
     @Override
     public Iterator<E> iterator() {
-        return new Iterator<>() {
-            private Node node;
-            private final Node last;
-
-            {
-                node = min(root);
-                last = max(root);
-                isTreeChanged = false;
-            }
-
-            private void checkChanges() {
-                if (isTreeChanged) {
-                    throw new RuntimeException("Tree structure was upgraded");
-                }
-            }
-
-            @Override
-            public boolean hasNext() {
-                checkChanges();
-                return node != last;
-            }
-
-            @Override
-            public E next() {
-                checkChanges();
-                if (!hasNext()) {
-                    throw new NoSuchElementException();
-                }
-
-                if (node.right != null) {
-                    node = min(node.right);
-                }
-                else if (node != root) {
-                    Node prev = node;
-                    node = node.anc;
-                    if (prev == node.right) {
-                        node = node.anc;
-                    }
-                }
-
-                return node.key;
-            }
-        };
+        return new TreeIterator();
     }
+    private class TreeIterator implements Iterator<E> {
+        private Node node;
+        private final Node last;
 
+        TreeIterator() {
+            node = min(root);
+            last = max(root);
+            isTreeChanged = false;
+        }
+
+        private void checkChanges() {
+            if (isTreeChanged) {
+                throw new ConcurrentModificationException("Tree structure was upgraded");
+            }
+        }
+
+        @Override
+        public boolean hasNext() {
+            checkChanges();
+            return node != last;
+        }
+
+        @Override
+        public E next() {
+            checkChanges();
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+
+            node = nextNode(node);
+            return node.key;
+        }
+    }
 
     @Override
     public Object[] toArray() {
@@ -235,14 +260,14 @@ public class Tree<E extends Comparable<E>> implements Collection<E> {
 
     @Override
     public boolean add(E o) {
-        if ((root = insert(root, o, null)) == null) {
-            return false;
-        }
-        ++size;
-        return isTreeChanged = true;
+        int size0 = size;
+        root = insert(root, o, null);
+        return size0 != size;
     }
     private Node insert(Node node, E key, Node anc) {
         if (node == null) {
+            ++size;
+            isTreeChanged = true;
             return new Node(key, anc);
         }
 
@@ -256,7 +281,7 @@ public class Tree<E extends Comparable<E>> implements Collection<E> {
         }
         // equals to - no duplicates
         else {
-            return null;
+            return node;
         }
 
         return rebalance(node);
@@ -292,9 +317,12 @@ public class Tree<E extends Comparable<E>> implements Collection<E> {
                     node.left.anc = node.anc;
                     node = node.left;
                 }
-                else {
+                else if (node.right != null) {
                     node.right.anc = node.anc;
                     node = node.right;
+                }
+                else {
+                    return null;
                 }
             }
             // 2 children
