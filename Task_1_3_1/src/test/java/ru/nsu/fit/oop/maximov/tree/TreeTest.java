@@ -14,7 +14,7 @@ class TreeTest {
     private static int MAX_SIZE = 10;
     private static int MAX_VALUE = 10;
 
-    static List<Set<Integer>> provider() {
+    static ArrayList<HashSet<Integer>> provider() {
         Random random = new Random(System.currentTimeMillis());
         var array = new ArrayList<HashSet<Integer>>();
 
