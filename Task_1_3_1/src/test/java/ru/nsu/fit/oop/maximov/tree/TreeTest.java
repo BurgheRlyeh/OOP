@@ -14,11 +14,11 @@ class TreeTest {
     private static int MAX_SIZE = 10;
     private static int MAX_VALUE = 10;
 
-    static ArrayList<HashSet<Integer>> provider() {
+    static List<Set<Integer>> provider() {
         Random random = new Random(System.currentTimeMillis());
         var array = new ArrayList<HashSet<Integer>>();
 
-        for (int i = 0; i < 1; ++i) {
+        for (int i = 0; i < MAX_SIZE; ++i) {
             var set = new HashSet<Integer>();
             for (int j = 0; j < MAX_SIZE; ++j) {
                 set.add(random.nextInt() % MAX_VALUE);
@@ -31,51 +31,53 @@ class TreeTest {
 
     @ParameterizedTest(name = "Test tree on random array #{index}")
     @MethodSource("provider")
-    void randomArrays(HashSet<Integer> set) {
+    void randomDataTest(Set<Integer> set) {
         Random random = new Random(System.currentTimeMillis());
 
         var tree = new Tree<>(set);
-        do {
-            // size
-            assertThat(tree.size()).isEqualTo(set.size());
-            // isEmpty
-            assertThat(tree.isEmpty()).isEqualTo(set.isEmpty());
 
-            // toArray
-            var sorted = new ArrayList<>(set);
-            sort(sorted);
-//            assertArrayEquals(tree.toArray(), sorted.toArray());
+        // size
+        assertThat(tree.size()).isEqualTo(set.size());
+        // isEmpty
+        assertThat(tree.isEmpty()).isEqualTo(set.isEmpty());
 
-//            int idx = 0;
-//            for (var elem : tree) {
-//                assertThat(elem).isEqualTo(sorted.get(idx));
-//            }
+        // toArray
+        var sorted = new ArrayList<>(set);
+        sort(sorted);
+        assertArrayEquals(tree.toArray(), sorted.toArray());
 
-            int num = random.nextInt() % MAX_VALUE;
-            assertThat(tree.add(num)).isEqualTo(set.add(num));
-            assertThat(tree.contains(num)).isEqualTo(set.contains(num));
-            assertThat(tree.remove(num)).isEqualTo(set.remove(num));
+        var expected = sorted.stream()
+                .filter(o -> o % 2 == 0)
+                .map(Object::toString)
+                .reduce(String::concat);
+        var res = tree.stream()
+                .filter(o -> o % 2 == 0)
+                .map(Object::toString)
+                .reduce(String::concat);
+        assertThat(res).isEqualTo(expected);
 
-//            var array = new ArrayList<Integer>();
-//            var size = random.nextInt() % MAX_SIZE;
-//            for (int i = 0; i < size; ++i) {
-//                array.add(random.nextInt() % MAX_VALUE);
-//            }
-//
-//            assertThat(tree.addAll(array)).isEqualTo(set.addAll(array));
-//            assertThat(tree.containsAll(array)).isEqualTo(set.containsAll(array));
-//            assertThat(tree.removeAll(array)).isEqualTo(set.removeAll(array));
-//
-//            for (int i = 0; i < size; ++i) {
-//                assertThat(tree.remove(sorted.get(i)))
-//                        .isEqualTo(set.remove(sorted.get(i)));
-//            }
+        int idx = 0;
+        for (var elem : tree) {
+            assertThat(elem).isEqualTo(sorted.get(idx++));
+        }
 
-                assertThat(tree.remove(sorted.get(1)))
-                        .isEqualTo(set.remove(sorted.get(0)));
+        int num = random.nextInt() % MAX_VALUE;
+        assertThat(tree.add(num)).isEqualTo(set.add(num));
+        assertThat(tree.contains(num)).isEqualTo(set.contains(num));
+        assertThat(tree.remove(num)).isEqualTo(set.remove(num));
 
-        } while ((set.size() != 1));
-
+        var array = new ArrayList<Integer>();
+        var size = random.nextInt() % MAX_SIZE;
+        for (int i = 0; i < size; ++i) {
+            array.add(random.nextInt() % MAX_VALUE);
+        }
+        assertThat(tree.addAll(array)).isEqualTo(set.addAll(array));
+        assertThat(tree.containsAll(array)).isEqualTo(set.containsAll(array));
+        assertThat(tree.removeAll(array)).isEqualTo(set.removeAll(array));
+        for (int i = 0; tree.size() < i && i < size; ++i) {
+            assertThat(tree.remove(sorted.get(i)))
+                    .isEqualTo(set.remove(sorted.get(i)));
+        }
     }
 
     @Test
@@ -88,7 +90,6 @@ class TreeTest {
         assertThrows(ClassCastException.class, () -> tree.remove("kcuf"));
         assertThrows(ClassCastException.class, () -> tree.contains(new Object()));
 
-//
         assertThrows(ConcurrentModificationException.class, () -> {
             for (var elem : tree) {
                 tree.add(0);
@@ -96,14 +97,4 @@ class TreeTest {
         });
 
     }
-
-    @Test
-    void stream(){
-        var tree = new Tree<String>();
-        tree.addAll(List.of("aba", "bbbb", "sadnd", "aboba", "bs", "brainfuck", "nope"));
-        var res = tree.stream().filter((s)->s.contains("b")).toList();
-        assertThat(res).containsExactlyInAnyOrder("aba", "bbbb", "aboba", "bs", "brainfuck");
-    }
-
-
 }
