@@ -1,60 +1,85 @@
 package ru.nsu.fit.oop.maximov;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Stack;
+import java.util.*;
 
+/**
+ * Calculator
+ * Main operation - calculate(String)
+ */
 public class Calculator {
-    public static void main(String[] args) {
-        System.out.println(calculate("abracadabra"));
-    }
+    private static final Stack<String> stack = new Stack<>();
 
-    private static Stack<String> stack = new Stack<String>();
-    private static void stringToStack(String expression) {
-        String[] atoms = expression.split(" ");
+    private static final Map<String, Operation> operations = new HashMap<>() {{
+        put("+", new Sum());
+        put("-", new Sub());
+        put("*", new Mult());
+        put("/", new Div());
+        put("log", new Log());
+        put("pow", new Pow());
+        put("sqrt", new Sqrt());
+        put("sin", new Sin());
+        put("cos", new Cos());
+    }};
 
-        for (var i = atoms.length - 1; 0 <= i; --i) {
-            stack.push(atoms[i]);
+    /**
+     * @param design - designation of new function
+     * @param operation - Object of class that extends Operation
+     */
+    public void addOperation(String design, Object operation) {
+        if (!operations.containsKey(design)) {
+            operations.put(design, (Operation) operation);
         }
     }
 
+    /**
+     * @param expression string - expression in prefix form
+     * @return result of calculations
+     */
     static double calculate(String expression) {
         stringToStack(expression);
-
-        var atom = stack.pop();
-        return defineOperation(atom).calculate(stack);
+        return operations.get(stack.pop()).calculate(stack);
     }
 
-    private static Operation defineOperation(String operation) {
-        return switch (operation) {
-            case ("+") -> new Sum();
-            case ("-") -> new Sub();
-            case ("*") -> new Mult();
-            case ("/") -> new Div();
-            case ("log") -> new Log();
-            case ("pow") -> new Pow();
-            case ("sqrt") -> new Sqrt();
-            case ("sin") -> new Sin();
-            case ("cos") -> new Cos();
-            default -> throw new IllegalArgumentException("Operation does not exist\n");
-        };
+    /**
+     * @param expression for dividing on atoms to push in stack
+     */
+    private static void stringToStack(String expression) {
+        Arrays.stream(expression.split(" ")).forEach(stack::push);
+        Collections.reverse(stack);
     }
 
+    /**
+     * @param string atom
+     * @return is atom a double number
+     */
     private static boolean isNumber(String string) {
-        if (string == null) {
-            return false;
-        }
         try {
-            double d = Double.parseDouble(string);
-        } catch (NumberFormatException nfe) {
+            Double.parseDouble(string);
+            return true;
+        } catch (NumberFormatException | NullPointerException e) {
             return false;
         }
-        return true;
     }
+
+    /**
+     * @param string atom
+     * @return is atom an operation
+     */
+    private static boolean isOperation(String string) {
+        return operations.containsKey(string);
+    }
+
+    /**
+     * @param atom atom
+     * @return result of atom's calculation
+     */
     static double calculateAtom(String atom) {
         if (isNumber(atom)) {
             return Double.parseDouble(atom);
         }
-        return defineOperation(atom).calculate(stack);
+        if (isOperation(atom)) {
+            return operations.get(atom).calculate(stack);
+        }
+        return 0;
     }
 }

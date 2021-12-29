@@ -5,14 +5,13 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.io.FileNotFoundException;
+import java.util.Stack;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CalculatorTest {
-
-    private static Stream<Arguments> provider() throws FileNotFoundException {
+    private static Stream<Arguments> provider() {
         return Stream.of(
                 // expression from example
                 Arguments.of(
@@ -44,7 +43,7 @@ public class CalculatorTest {
 
     @ParameterizedTest
     @MethodSource("provider")
-    public void findSubStringTest(String expression, double answer) {
+    public void regularTest(String expression, double answer) {
         assertEquals(Calculator.calculate(expression), answer);
     }
 
@@ -54,12 +53,15 @@ public class CalculatorTest {
     }
 
     @Test
-    public void TestException() {
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> {
-                    Calculator.calculate("abracadabra");
-                }
-        );
+    public void newOperationTest() {
+        Calculator calculator = new Calculator();
+        calculator.addOperation("tan", new Operation() {
+            @Override
+            double calculate(Stack<String> atoms) {
+                var a = Calculator.calculateAtom(atoms.pop());
+                return Math.tan(a);
+            }
+        });
+        assertEquals(0.9999999999851034, Calculator.calculate("tan 0.78539816339"));
     }
 }

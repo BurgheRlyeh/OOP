@@ -5,6 +5,10 @@ import java.util.Stack;
 import static java.lang.Math.*;
 
 abstract class Operation {
+    /**
+     * @param operands stack with expression's atoms
+     * @return result of atom's calculation
+     */
     abstract double calculate(Stack<String> operands);
 }
 
@@ -74,3 +78,4 @@ class Cos extends Operation {
         return cos(num);
     }
 }
+
