@@ -8,30 +8,14 @@ public class Prime {
             return false;
         }
 
-        for (int i = 2; i < n; i++)
+        for (int i = 2; i * i < n; i++)
             if (n % i == 0)
                 return false;
 
         return true;
     }
-    public static boolean isCollectionHasPrime(Collection<Integer> collection) {
-        for (var num : collection) {
-            if (isPrime(num)) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     public static boolean isComposite(int n) {
         return !isPrime(n);
-    }
-    public static boolean isCollectionHasComposite(Collection<Integer> collection) {
-        for (var num : collection) {
-            if (isComposite(num)) {
-                return true;
-            }
-        }
-        return false;
     }
 }
