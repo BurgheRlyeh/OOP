@@ -16,7 +16,15 @@ public class PrimeTest {
                         true
                 ),
                 Arguments.of(
-                        Arrays.asList(6997901, 6997927, 6997937, 6997967, 6998009, 6998029, 6998039, 6998051, 6998053),
+                        Arrays.asList(6997901, 6997927, 6997937, 6997967, 6998009, 6998029, 6998039, 6998051, 6998053,
+                                6997901, 6997927, 6997937, 6997967, 6998009, 6998029, 6998039, 6998051, 6998053,
+                                6997901, 6997927, 6997937, 6997967, 6998009, 6998029, 6998039, 6998051, 6998053,
+                                6997901, 6997927, 6997937, 6997967, 6998009, 6998029, 6998039, 6998051, 6998053,
+                                6997901, 6997927, 6997937, 6997967, 6998009, 6998029, 6998039, 6998051, 6998053,
+                                6997901, 6997927, 6997937, 6997967, 6998009, 6998029, 6998039, 6998051, 6998053,
+                                6997901, 6997927, 6997937, 6997967, 6998009, 6998029, 6998039, 6998051, 6998053,
+                                6997901, 6997927, 6997937, 6997967, 6998009, 6998029, 6998039, 6998051, 6998053,
+                                6997901, 6997927, 6997937, 6997967, 6998009, 6998029, 6998039, 6998051, 6998053),
                         false
                 )
         );
@@ -31,9 +39,9 @@ public class PrimeTest {
     }
 
     public long SequentialSolution(List<Integer> list, boolean answer) {
-        long time0 = System.currentTimeMillis();
+        var time0 = System.currentTimeMillis();
 
-        boolean result = false;
+        var result = false;
         for (var num : list) {
             if (Prime.isComposite(num)) {
                 result = true;
@@ -41,26 +49,28 @@ public class PrimeTest {
             }
         }
 
-        long time = System.currentTimeMillis();
+        var time = System.currentTimeMillis();
         return result == answer ? time - time0 : -1;
     }
 
     private static final int MAX_THREADS = 3;
-    public long ThreadSolution(List<Integer> list, boolean answer) {
-        long time0 = System.currentTimeMillis();
+    public List<Long> ThreadSolution(List<Integer> list, boolean answer) {
 
-        AtomicBoolean result = new AtomicBoolean();
-        final ArrayList<Thread> threads = new ArrayList<>();
+        var result = new AtomicBoolean();
+        var threads = new ArrayList<Thread>();
+        var times = new ArrayList<Long>();
 
-        int step = Math.max(MAX_THREADS,
+        var step = Math.max(MAX_THREADS,
                 list.size() / (MAX_THREADS - (list.size() % MAX_THREADS == 0 ? 0 : 1)));
 
-        for (int i = 0; i < list.size(); i += step){
-            int idx = i;
+        for (var i = 0; i < list.size(); i += step){
+            var idx = i;
 
             Thread thread = new Thread() {
                 @Override
                 public void run() {
+                    var time0 = System.currentTimeMillis();
+
                     for (var num : list.subList(idx, idx + Math.min(list.size() - idx, step) - 1)) {
                         if (isInterrupted()) {
                             break;
@@ -70,16 +80,18 @@ public class PrimeTest {
                             break;
                         }
                     }
+
+                    var time = System.currentTimeMillis();
+                    times.add(time - time0);
                 }
             };
             thread.start();
             threads.add(thread);
         }
 
-        for (Thread thread : threads) {
+        for (var thread : threads) {
             if (result.get()) {
                 threads.forEach(Thread::interrupt);
-
                 break;
             }
             try {
@@ -87,8 +99,7 @@ public class PrimeTest {
             } catch (InterruptedException ignored) {}
         }
 
-        long time = System.currentTimeMillis();
-        return result.get() == answer ? time - time0 : -1;
+        return result.get() == answer ? times : null;
     }
 
     public static long ParallelStreamSolution(List<Integer> list, boolean answer) {
