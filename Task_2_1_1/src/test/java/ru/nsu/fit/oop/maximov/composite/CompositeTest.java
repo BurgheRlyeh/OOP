@@ -38,13 +38,16 @@ public class CompositeTest {
 
     @RepeatedTest(TESTS_NUMBER)
     void test() {
-        sequentialSolutionAverageTime += Composite.getTimeExecution(list) / (double) TESTS_NUMBER;
-        threadSolutionAverageTime += ThreadComposite.getTimeExecution(list) / (double) TESTS_NUMBER;
+        sequentialSolutionAverageTime += new Composite().getTimeExecution(list) / (double) TESTS_NUMBER;
+
+        var threadComposite = new ThreadComposite();
+        threadSolutionAverageTime += new ThreadComposite().getTimeExecution(list) / (double) TESTS_NUMBER;
         for (var i = 0; i < MAX_THREADS; ++i) {
             threadSolutionAverageTimes.set(i, threadSolutionAverageTimes.get(i) +
-                    ThreadComposite.getTimeExecution(list, i + 1) / (double) TESTS_NUMBER);
+                    threadComposite.getTimeExecution(list, i + 1) / (double) TESTS_NUMBER);
         }
-        parallelStreamSolutionAverageTime += ParallelStreamComposite.getTimeExecution(list) / (double) TESTS_NUMBER;
+
+        parallelStreamSolutionAverageTime += new ParallelStreamComposite().getTimeExecution(list) / (double) TESTS_NUMBER;
     }
 
     @AfterAll
