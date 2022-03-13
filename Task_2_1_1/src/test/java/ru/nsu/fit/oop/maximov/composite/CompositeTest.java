@@ -24,7 +24,7 @@ public class CompositeTest {
     private static final List<Integer> list = new ArrayList<>();
 
     @BeforeAll
-    static void testDataReader() {
+    static void testPreparation() {
         try {
             BufferedReader reader = new BufferedReader(new FileReader("src/test/java/ru/nsu/fit/oop/maximov/composite/data/numbers.txt"));
             for (String text = reader.readLine(); text != null; text = reader.readLine()) {
@@ -32,6 +32,11 @@ public class CompositeTest {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+
+        // warming up
+        for (int i = 0; i < TESTS_NUMBER / 10; ++i) {
+            new ThreadComposite().getTimeExecution(list);
         }
     }
 

@@ -28,37 +28,40 @@ class ThreadComposite extends Composite {
     public boolean isListContainsComposite(List<Integer> list) {
         return isListContainsComposite(list, MAX_THREADS);
     }
+
     public boolean isListContainsComposite(List<Integer> list, int threadsNumber) {
         threadsNumber = Math.min(threadsNumber, MAX_THREADS);
 
         var result = new AtomicBoolean();
         var threads = new ArrayList<Thread>();
-        var step = Math.max(threadsNumber,
+        var sublistLength = Math.max(threadsNumber,
                 list.size() / (threadsNumber - (list.size() % threadsNumber == 0 ? 0 : 1)));
 
-        for (var i = 0; i < list.size(); i += step){
-            var idx = i;
+        for (var i = 0; i < list.size(); i += sublistLength) {
+            var sublist = list.subList(i,
+                    i + Math.min(list.size() - i, sublistLength) - 1);
 
             var thread = new Thread(() -> {
-                result.set(list
-                        .subList(idx, idx + Math.min(list.size() - idx, step) - 1)
-                        .stream()
-                        .takeWhile(x -> !Thread.currentThread().isInterrupted())
-                        .anyMatch(Composite::isComposite)
-                );
+                for (var number : sublist) {
+                    if (result.get()) {
+                        break;
+                    }
+                    if (isComposite(number)) {
+                        result.set(true);
+                        break;
+                    }
+                }
             });
             thread.start();
             threads.add(thread);
         }
 
-        threads.stream()
-                .takeWhile(thread -> !result.get())
-                .forEach(thread -> {
-                    try {
-                        thread.join();
-                    }
-                    catch (InterruptedException ignored) {}
-                });
+        for (var thread : threads) {
+            try {
+                thread.join();
+            } catch (InterruptedException ignored) {
+            }
+        }
 
         return result.get();
     }
