@@ -1,0 +1,52 @@
+{
+  "storageSize": 10,
+  "bakers": [
+    {
+      "ID": 1,
+      "workTime": 1
+    },
+    {
+      "ID": 2,
+      "workTime": 4
+    },
+    {
+      "ID": 3,
+      "workTime": 3
+    },
+    {
+      "ID": 4,
+      "workTime": 5
+    },
+    {
+      "ID": 5,
+      "workTime": 2
+    }
+  ],
+  "couriers": [
+    {
+      "ID": 1,
+      "workTime": 9,
+      "parallelWorkAmount": 1
+    },
+    {
+      "ID": 2,
+      "workTime": 7,
+      "parallelWorkAmount": 4
+    },
+    {
+      "ID": 3,
+      "workTime": 6,
+      "parallelWorkAmount": 3
+    },
+    {
+      "ID": 4,
+      "workTime": 8,
+      "parallelWorkAmount": 5
+    },
+    {
+      "ID": 5,
+      "workTime": 5,
+      "parallelWorkAmount": 2
+    }
+  ]
+}
