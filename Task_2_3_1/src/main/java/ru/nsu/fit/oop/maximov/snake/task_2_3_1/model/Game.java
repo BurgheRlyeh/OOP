@@ -4,8 +4,28 @@ public class Game {
     public Map map;
     public Snake snake;
 
-    public Game(int width, int height) {
+    private int score = 0;
+    private final int scoreLimit;
+
+    public Game(int width, int height, int scoreLimit) {
         map = new Map(this, width, height);
         snake = new Snake(map, new Point(width / 2, height / 2));
+
+        this.scoreLimit = scoreLimit;
+
     }
+
+    public void increaseScore() {
+        ++score;
+    }
+
+    public Integer getScore() {
+        return score;
+    }
+
+    public int getScoreLimit() {
+        return scoreLimit;
+    }
+
+
 }

@@ -1,6 +1,6 @@
 package ru.nsu.fit.oop.maximov.snake.task_2_3_1.model;
 
-public class Point {
+class Point {
     int x;
     int y;
     PointType type;
@@ -18,10 +18,5 @@ public class Point {
     public boolean isInTheArea(Point start, Point end) {
         return start.x <= x && x <= end.x
                 && start.y <= y && y <= end.y;
-    }
-
-    public Point next(Direction direction) {
-        var move = direction.move();
-        return new Point(x + move.x, y + move.y);
     }
 }

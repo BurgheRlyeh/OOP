@@ -15,7 +15,7 @@ public class Snake {
         snake.add(startPosition);
     }
 
-    public void move(Direction direction) {
+    public void move(Move direction) {
         var next = map.next(snake.getLast(), direction);
         switch (next.type) {
             case FREE -> {

@@ -25,7 +25,7 @@ tasks.withType(JavaCompile) {
 
 application {
     mainModule = 'ru.nsu.fit.oop.maximov.snake.task_2_3_1'
-    mainClass = 'ru.nsu.fit.oop.maximov.snake.task_2_3_1.HelloApplication'
+    mainClass = 'ru.nsu.fit.oop.maximov.snake.task_2_3_1.SnakeApplication'
 }
 
 javafx {
