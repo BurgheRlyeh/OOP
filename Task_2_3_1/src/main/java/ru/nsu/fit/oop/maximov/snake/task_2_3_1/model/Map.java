@@ -1,7 +1,7 @@
 package ru.nsu.fit.oop.maximov.snake.task_2_3_1.model;
 
 public class Map {
-    private Game model;
+    private final Game model;
 
     private Point[][] map;
     private final int width;
@@ -9,13 +9,14 @@ public class Map {
 
     public Map(Game model, int width, int height) {
         this.model = model;
+
         this.width = width;
         this.height = height;
 
         map = new Point[height][width];
         for (int y = 0; y < height; ++y) {
             for (int x = 0; x < width; ++x) {
-                map[y][x] = new Point(x, y, PointType.FREE);
+                map[y][x] = new Point(x, y);
             }
         }
     }
@@ -33,11 +34,11 @@ public class Map {
         point.y = point.y < 0 ? height - 1 : 0;
     }
 
-    public Point next(Point point, Direction direction) {
+    public Point next(Point point, Move move) {
         if (!isPointInTheArea(point)) {
             throw new IllegalArgumentException();
         }
-        var next = point.next(direction);
+        var next = move.move(point); //point.next(direction);
         if (!isPointInTheArea(next)) {
             updatePoint(next);
         }

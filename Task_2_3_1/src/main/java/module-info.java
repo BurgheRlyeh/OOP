@@ -5,4 +5,6 @@ module ru.nsu.fit.oop.maximov.snake.task_2_3_1 {
 
     opens ru.nsu.fit.oop.maximov.snake.task_2_3_1 to javafx.fxml;
     exports ru.nsu.fit.oop.maximov.snake.task_2_3_1;
+    exports ru.nsu.fit.oop.maximov.snake.task_2_3_1.controllers;
+    opens ru.nsu.fit.oop.maximov.snake.task_2_3_1.controllers to javafx.fxml;
 }
