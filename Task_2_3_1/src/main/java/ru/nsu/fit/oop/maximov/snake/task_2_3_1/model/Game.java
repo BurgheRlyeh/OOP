@@ -1,31 +1,32 @@
 package ru.nsu.fit.oop.maximov.snake.task_2_3_1.model;
 
+import java.util.Random;
+
 public class Game {
     public Map map;
     public Snake snake;
 
-    private int score = 0;
-    private final int scoreLimit;
-
-    public Game(int width, int height, int scoreLimit) {
+    public Game(int width, int height) {
         map = new Map(this, width, height);
-        snake = new Snake(map, new Point(width / 2, height / 2));
-
-        this.scoreLimit = scoreLimit;
-
+        snake = new Snake(this, map, map.getPoint(width / 2 - 1, height / 2 - 1));
+        putFood();
     }
 
-    public void increaseScore() {
-        ++score;
+    public void moveSnake(Move move) {
+        snake.setDirection(move);
     }
 
-    public Integer getScore() {
-        return score;
+    public void moveSnake() {
+        snake.move();
     }
 
-    public int getScoreLimit() {
-        return scoreLimit;
+    public void putFood() {
+        int foodX, foodY;
+        do {
+            foodX = new Random().nextInt(map.width());
+            foodY = new Random().nextInt(map.height());
+        } while (map.getPoint(foodX, foodY).getType() != PointType.FREE);
+
+        map.getPoint(foodX, foodY).type = PointType.FOOD;
     }
-
-
 }
