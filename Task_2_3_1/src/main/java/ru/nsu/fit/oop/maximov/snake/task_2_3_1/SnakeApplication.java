@@ -4,7 +4,6 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import ru.nsu.fit.oop.maximov.snake.task_2_3_1.controllers.MenuController;
 
 import java.io.IOException;
 

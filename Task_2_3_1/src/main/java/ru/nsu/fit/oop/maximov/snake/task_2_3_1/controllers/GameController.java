@@ -19,19 +19,19 @@ import java.io.IOException;
 
 public class GameController {
     @FXML
-    Canvas canvas;
+    private Canvas canvas;
 
     private final int WIDTH = 30;
     private final int HEIGHT = 30;
     private final int POINT_SIZE = 20;
 
-    Game game;
-    Painter painter;
+    private final Game game;
+    private final Painter painter;
 
-    Timeline timeline;
+    private Timeline timeline;
 
-    Stage stage;
-    Scene scene;
+    private Stage stage;
+    private Scene scene;
 
     public GameController() {
         game = new Game(WIDTH, HEIGHT);
